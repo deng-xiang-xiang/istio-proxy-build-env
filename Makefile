@@ -1,4 +1,3 @@
 build:
-	docker buildx bake -f bake.hcl --push	
-
+	sh ./join.sh morlay/istio-proxy-build-env:latest
 	
