@@ -4,17 +4,6 @@ group "default" {
   ]
 }
 
-target "istio-proxy" {
-context = "."
-  dockerfile = "istio-proxy.Dockerfile"
-  tags = [
-    "morlay/istio-proxy:latest"
-  ]
-  platforms = [
-    "linux/arm64"
-  ]
-}
-
 target "build-env" {
   context = "."
   dockerfile = "Dockerfile"
