@@ -1,6 +1,6 @@
-FROM morlay/istio-proxy-build-env:latest as builder
-
 ARG TARGETARCH
+
+FROM morlay/istio-proxy-build-env:latest-${TARGETARCH} as builder
 
 ENV ISTIO_PROXY_VERSION 1.6.0
 
