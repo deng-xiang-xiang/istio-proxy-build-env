@@ -24,6 +24,7 @@ RUN set -eux; \
     ninja-build \
     curl \
     lsb-core \
+    openjdk-11-jdk \
     software-properties-common
 
 RUN set -eux; \
