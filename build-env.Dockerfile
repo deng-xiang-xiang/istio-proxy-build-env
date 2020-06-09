@@ -47,6 +47,7 @@ RUN set -eux; \
     esac; \
     echo "deb-src http://ports.ubuntu.com/ubuntu-ports/ bionic-security main restricted" >> /etc/apt/sources.list; \
     apt-get update; \
+    mkdir -p /usr/lib/jvm/java-11-openjdk-${TARGETARCH}/lib; \
     cd /usr/lib/jvm; \
     apt source openjdk-11-jdk-headless; \
     cd openjdk-lts-11.0.7+10/src/utils/hsdis; \
