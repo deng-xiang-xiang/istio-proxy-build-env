@@ -50,6 +50,7 @@ RUN set -eux; \
     make all64; \
     \
     cp build/linux-${ARCH}/hsdis-${ARCH}.so /usr/lib/jvm/java-11-openjdk-${TARGETARCH}/lib/; \
+    cp build/linux-${ARCH}/hsdis-${ARCH}.so /usr/lib/jvm/java-11-openjdk-${TARGETARCH}/lib/server/; \
     rm -rf /tmp/jdk;
 
 RUN set -eux; \
