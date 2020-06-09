@@ -5,6 +5,7 @@ ENV DEBIAN_FRONTEND noninteractive
 
 RUN set -eux; \
     \
+    echo "deb-src http://ports.ubuntu.com/ubuntu-ports/ bionic-security main restricted" >> /etc/apt/sources.list; \
     apt-get update; \
     apt-get install -y \
     build-essential \
@@ -27,16 +28,6 @@ RUN set -eux; \
     openjdk-11-jdk \
     software-properties-common
 
-RUN set -eux; \
-    \
-    case "${TARGETARCH}" in \
-        amd64) BAZELISK_URL=https://github.com/bazelbuild/bazelisk/releases/download/v1.5.0/bazelisk-linux-amd64;; \
-        arm64) BAZELISK_URL=https://github.com/Tick-Tocker/bazelisk-arm64/releases/download/arm64/bazelisk-linux-arm64;; \
-     *) echo "unsupported architecture"; exit 1 ;; \
-    esac; \
-    wget -O /usr/local/bin/bazel ${BAZELISK_URL}; \
-    chmod +x /usr/local/bin/bazel
-
 # build hsdis-<arch>.so
 # see https://metebalci.com/blog/how-to-build-the-hsdis-disassembler-plugin-on-ubuntu-18/
 RUN set -eux; \
@@ -46,17 +37,29 @@ RUN set -eux; \
         arm64) export ARCH=aarch64;; \
         *) echo "unsupported architecture"; exit 1 ;; \
     esac; \
-    echo "deb-src http://ports.ubuntu.com/ubuntu-ports/ bionic-security main restricted" >> /etc/apt/sources.list; \
-    apt-get update; \
     mkdir -p /usr/lib/jvm/java-11-openjdk-${TARGETARCH}/lib; \
-    cd /usr/lib/jvm; \
+    \
+    mkdir -p /tmp/jdk && cd /tmp/jdk;  \
     apt source openjdk-11-jdk-headless; \
-    cd openjdk-lts-11.0.7+10/src/utils/hsdis; \
+    cd $(ls -b | head -1)/src/utils/hsdis; \
+    \
     wget https://ftp.gnu.org/gnu/binutils/binutils-2.34.tar.gz; \
     tar -xzf binutils-2.34.tar.gz; \
-    make BINUTILS=binutils-2.34 ARCH=${ARCH}; \
+    export BINUTILS=binutils-2.34; \
+    make all64; \
+    \
     cp build/linux-${ARCH}/hsdis-${ARCH}.so /usr/lib/jvm/java-11-openjdk-${TARGETARCH}/lib/ \
-    rm -rf /usr/lib/jvm/openjdk-lts-11.0.7+10/src/utils/hsdis;
+    rm -rf /tmp/jdk;
+
+RUN set -eux; \
+    \
+    case "${TARGETARCH}" in \
+        amd64) BAZELISK_URL=https://github.com/bazelbuild/bazelisk/releases/download/v1.5.0/bazelisk-linux-amd64;; \
+        arm64) BAZELISK_URL=https://github.com/Tick-Tocker/bazelisk-arm64/releases/download/arm64/bazelisk-linux-arm64;; \
+     *) echo "unsupported architecture"; exit 1 ;; \
+    esac; \
+    wget -O /usr/local/bin/bazel ${BAZELISK_URL}; \
+    chmod +x /usr/local/bin/bazel
 
 ENV GOVERSION=1.14.4
 
