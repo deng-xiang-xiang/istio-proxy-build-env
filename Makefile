@@ -3,4 +3,6 @@ debug-arm:
 
 rebuild-build-env:
 	git tag -f build-env && git push -f origin build-env
-	
+
+rebuild-istio-proxy:
+	git tag -f istio-proxy && git push -f origin istio-proxy
