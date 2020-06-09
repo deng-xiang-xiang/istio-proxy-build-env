@@ -31,7 +31,7 @@ RUN set -eux; \
 RUN set -eux; \
     \
     case "${TARGETARCH}" in \
-        amd64) BAZELISK_URL=https://github.com/bazelbuild/bazelisk/releases/download/latest/bazelisk-linux-amd64;; \
+        amd64) BAZELISK_URL=https://github.com/bazelbuild/bazelisk/releases/download/v1.5.0/bazelisk-linux-amd64;; \
         arm64) BAZELISK_URL=https://github.com/Tick-Tocker/bazelisk-arm64/releases/download/arm64/bazelisk-linux-arm64;; \
      *) echo "unsupported architecture"; exit 1 ;; \
     esac; \
