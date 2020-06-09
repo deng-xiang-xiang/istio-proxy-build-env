@@ -6,6 +6,8 @@ ARG TARGETARCH
 
 ENV ISTIO_PROXY_VERSION 1.6.0
 
+WORKDIR /go/src
+
 RUN set -eux; \
     \
     wget https://github.com/istio/proxy/archive/${ISTIO_PROXY_VERSION}.zip; \
@@ -20,10 +22,11 @@ WORKDIR /go/src/proxy
 
 RUN set -eux; \
     \
+    export PATH="${LLVM_PATH}/bin:${PATH}";
     export JAVA_HOME="$(dirname $(dirname $(realpath $(which javac))))"; \
-    export BAZEL_BUILD_ARGS="--define=ABSOLUTE_JAVABASE=${JAVA_HOME} --javabase=@bazel_tools//tools/jdk:absolute_javabase --host_javabase=@bazel_tools//tools/jdk:absolute_javabase --java_toolchain=@bazel_tools//tools/jdk:toolchain_vanilla --host_java_toolchain=@bazel_tools//tools/jdk:toolchain_vanilla"; \
+    export BAZEL_BUILD_ARGS="--verbose_failures --define=ABSOLUTE_JAVABASE=${JAVA_HOME} --javabase=@bazel_tools//tools/jdk:absolute_javabase --host_javabase=@bazel_tools//tools/jdk:absolute_javabase --java_toolchain=@bazel_tools//tools/jdk:toolchain_vanilla --host_java_toolchain=@bazel_tools//tools/jdk:toolchain_vanilla"; \
     make build_envoy;
 
 FROM busybox
 
-COPY --from=builder /proxy /proxy
+COPY --from=builder /root/go/proxy /proxy

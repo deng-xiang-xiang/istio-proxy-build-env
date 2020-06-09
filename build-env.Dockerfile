@@ -26,7 +26,24 @@ RUN set -eux; \
     curl \
     lsb-core \
     openjdk-11-jdk \
-    software-properties-common
+    software-properties-common;
+
+RUN set -eux; \
+    \
+     case "${TARGETARCH}" in \
+        amd64) \
+            wget -O gntool.zip https://chrome-infra-packages.appspot.com/dl/gn/gn/linux-amd64/+/latest; \
+            unzip gntool.zip -d gntool; \
+            cp gntool/gn /usr/local/bin/gn; \
+            chmod +x /usr/local/bin/gn; \
+            rm -rf gntool*; \
+        ;; \
+        arm64) \
+            wget -O /usr/local/bin/gn https://github.com/Jingzhao123/google-gn/releases/download/gn-arm64/gn; \
+            chmod +x /usr/local/bin/gn; \
+        ;; \
+        *) echo "unsupported architecture"; exit 1 ;; \
+     esac;
 
 # build hsdis-<arch>.so
 # see https://metebalci.com/blog/how-to-build-the-hsdis-disassembler-plugin-on-ubuntu-18/
@@ -95,4 +112,4 @@ RUN set -eux; \
     rm "./${LLVM_RELEASE}.tar.xz"; \
     echo "${LLVM_PATH}/lib" > /etc/ld.so.conf.d/llvm.conf; \
     ldconfig; \
-    export PATH=${LLVM_PATH}/bin:${PATH};
+    export PATH="${LLVM_PATH}/bin:${PATH}";
