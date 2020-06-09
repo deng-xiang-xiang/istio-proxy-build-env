@@ -24,9 +24,7 @@ RUN set -eux; \
     ninja-build \
     curl \
     lsb-core \
-    software-properties-common \
-    openjdk-8-jdk \
-    ca-certificates-java
+    software-properties-common
 
 RUN set -eux; \
     \
@@ -38,27 +36,25 @@ RUN set -eux; \
     wget -O /usr/local/bin/bazel ${BAZELISK_URL}; \
     chmod +x /usr/local/bin/bazel
 
-# fix hsdis-aarch64.so
+# build hsdis-<arch>.so
+# see https://metebalci.com/blog/how-to-build-the-hsdis-disassembler-plugin-on-ubuntu-18/
 RUN set -eux; \
     \
     case "${TARGETARCH}" in \
-        amd64) \
-        ;; \
-        arm64) \
-            cd /usr/lib/jvm; \
-            git clone --depth=1 https://github.com/AdoptOpenJDK/openjdk-jdk8u.git; \
-            cd openjdk-jdk8u/hotspot/src/share/tools/hsdis;  \
-            wget https://ftp.gnu.org/gnu/binutils/binutils-2.29.tar.gz; \
-            tar -xzf binutils-2.29.tar.gz; \
-            sed -ri 's/development=.*/development=false/' ./binutils-2.29/bfd/development.sh; \
-            make BINUTILS=binutils-2.29 ARCH=aarch64; \
-            mkdir -p /usr/lib/jvm/java-8-openjdk-arm64/jre/lib/aarch64/server/; \
-            cp build/linux-aarch64/hsdis-aarch64.so /usr/lib/jvm/java-8-openjdk-arm64/jre/lib/aarch64/server/; \
-            rm -rf /usr/lib/jvm/openjdk-jdk8u; \
-        ;; \
+        amd64) export ARCH=amd64;; \
+        arm64) export ARCH=aarch64;; \
         *) echo "unsupported architecture"; exit 1 ;; \
-    esac;
-
+    esac; \
+    echo "deb-src http://ports.ubuntu.com/ubuntu-ports/ bionic-security main restricted" >> /etc/apt/sources.list; \
+    apt-get update; \
+    cd /usr/lib/jvm; \
+    apt source openjdk-11-jdk-headless; \
+    cd openjdk-lts-11.0.7+10/src/utils/hsdis; \
+    wget https://ftp.gnu.org/gnu/binutils/binutils-2.34.tar.gz; \
+    tar -xzf binutils-2.34.tar.gz; \
+    make BINUTILS=binutils-2.34 ARCH=${ARCH}; \
+    cp build/linux-${ARCH}/hsdis-${ARCH}.so /usr/lib/jvm/java-11-openjdk-${TARGETARCH}/lib/ \
+    rm -rf /usr/lib/jvm/openjdk-lts-11.0.7+10/src/utils/hsdis;
 
 ENV GOVERSION=1.14.4
 
