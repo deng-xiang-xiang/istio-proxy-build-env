@@ -43,12 +43,13 @@ RUN set -eux; \
     apt source openjdk-11-jdk-headless; \
     cd $(ls -b | head -1)/src/utils/hsdis; \
     \
-    wget https://ftp.gnu.org/gnu/binutils/binutils-2.34.tar.gz; \
-    tar -xzf binutils-2.34.tar.gz; \
-    export BINUTILS=binutils-2.34; \
+    wget https://ftp.gnu.org/gnu/binutils/binutils-2.32.tar.gz; \
+    tar -xzf binutils-2.32.tar.gz; \
+    export BINUTILS=binutils-2.32; \
+    sed -i -e 's/app_data->dfn = disassembler(native_bfd)/app_data->dfn = disassembler(bfd_get_arch(native_bfd),bfd_big_endian(native_bfd),bfd_get_mach(native_bfd),native_bfd)/g' hsdis.c;\
     make all64; \
     \
-    cp build/linux-${ARCH}/hsdis-${ARCH}.so /usr/lib/jvm/java-11-openjdk-${TARGETARCH}/lib/ \
+    cp build/linux-${ARCH}/hsdis-${ARCH}.so /usr/lib/jvm/java-11-openjdk-${TARGETARCH}/lib/; \
     rm -rf /tmp/jdk;
 
 RUN set -eux; \
