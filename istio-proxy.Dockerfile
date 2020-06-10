@@ -22,11 +22,12 @@ WORKDIR /go/src/proxy
 
 RUN set -eux; \
     \
-    export PATH="${LLVM_PATH}/bin:${PATH}";
+    export PATH="${LLVM_PATH}/bin:${PATH}"; \
     export JAVA_HOME="$(dirname $(dirname $(realpath $(which javac))))"; \
     export BAZEL_BUILD_ARGS="--verbose_failures --define=ABSOLUTE_JAVABASE=${JAVA_HOME} --javabase=@bazel_tools//tools/jdk:absolute_javabase --host_javabase=@bazel_tools//tools/jdk:absolute_javabase --java_toolchain=@bazel_tools//tools/jdk:toolchain_vanilla --host_java_toolchain=@bazel_tools//tools/jdk:toolchain_vanilla"; \
-    make build_envoy;
+    make build_envoy; \
+    cp -r $(bazel info $(BAZEL_BUILD_ARGS) output_path) ./output
 
 FROM busybox
 
-COPY --from=builder /root/go/proxy /proxy
+COPY --from=builder /go/src/proxy/output /output
