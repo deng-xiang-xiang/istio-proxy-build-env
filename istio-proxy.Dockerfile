@@ -26,8 +26,9 @@ RUN set -eux; \
     export JAVA_HOME="$(dirname $(dirname $(realpath $(which javac))))"; \
     export BAZEL_BUILD_ARGS="--verbose_failures --define=ABSOLUTE_JAVABASE=${JAVA_HOME} --javabase=@bazel_tools//tools/jdk:absolute_javabase --host_javabase=@bazel_tools//tools/jdk:absolute_javabase --java_toolchain=@bazel_tools//tools/jdk:toolchain_vanilla --host_java_toolchain=@bazel_tools//tools/jdk:toolchain_vanilla"; \
     make build_envoy; \
-    cp -r $(bazel info $(BAZEL_BUILD_ARGS) output_path) ./output
+    mkdir -p /envoy; \
+    cp -r bazel-bin/src/envoy /envoy
 
 FROM busybox
 
-COPY --from=builder /go/src/proxy/output /output
+COPY --from=builder /envoy /envoy
