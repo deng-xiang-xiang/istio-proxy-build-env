@@ -18,6 +18,7 @@ jobs:
       - run: docker buildx bake -f istio-proxy-bake.hcl istio-proxy-amd64 --push
   arm64:
     runs-on: ubuntu-latest
+    timeout-minutes: 1800
     steps:
       - uses: actions/checkout@v2
       - uses: crazy-max/ghaction-docker-buildx@v1

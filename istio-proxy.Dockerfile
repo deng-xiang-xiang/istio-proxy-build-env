@@ -2,21 +2,16 @@ ARG ARCH
 
 FROM morlay/istio-proxy-build-env:latest-${ARCH} as builder
 
-ARG TARGETARCH
-
-ENV ISTIO_PROXY_VERSION 1.6.0
+ARG VERSION
 
 WORKDIR /go/src
 
+# clone istio/proxy
 RUN set -eux; \
     \
-    wget https://github.com/istio/proxy/archive/${ISTIO_PROXY_VERSION}.zip; \
-    unzip ./${ISTIO_PROXY_VERSION}.zip; \
-    mkdir -p /go/src; \
-    mv ./proxy-${ISTIO_PROXY_VERSION}/ /go/src/proxy; \
+    git clone https://github.com/istio/proxy /go/src/proxy; \
     cd /go/src/proxy; \
-    git config --global user.email "you@example.com"; \
-    git init && git add . && git commit -m "init";
+    git checkout ${VERSION};
 
 WORKDIR /go/src/proxy
 
